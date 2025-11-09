@@ -1,3 +1,12 @@
+TO RUN: 
+  Type your text in input.txt
+  hit run.bat
+  go go audio folder, and you will have your audio there. 
+
+
+USE GPU FOR FASTER GENERATION!!
+
+==========================================
 Athena Voice Generator using Microsoft VibeVoice
 ================================================
 
