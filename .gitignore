@@ -1,0 +1,33 @@
+# Virtual environments / caches
+venv/
+.venv/
+__pycache__/
+*.py[cod]
+*.log
+*.tmp
+*.cache/
+
+# Editors / OS
+.vscode/
+*.code-workspace
+.DS_Store
+Thumbs.db
+
+# Generated audio & artifacts
+audio/
+*.wav
+*.mp3
+*.flac
+
+# Large model files (use LFS if needed)
+*.pt
+*.pth
+*.bin
+*.onnx
+*.safetensors
+*.ckpt
+
+# Local sources not for this repo
+pytorch/
+vibevoice_repo/
+model/
