@@ -1,0 +1,47 @@
+Title: RTX 5060 Ti (sm_120) — How We Got PyTorch Working & How It Runs
+
+Context
+- GPU: NVIDIA GeForce RTX 5060 Ti (Blackwell, compute capability sm_120).
+- OS: Windows 10/11.
+- Goal: Use PyTorch with CUDA on a 50-series card before official stable wheels include sm_120 support.
+
+What we did (setup)
+1) Python virtual environment
+   - Created and activated a venv under D:\TikTok project.
+
+2) Installed PyTorch nightly with CUDA 12.9
+   - Command:
+     pip install --pre torch --index-url https://download.pytorch.org/whl/nightly/cu129
+   - Nightly cu129 wheels include kernels for sm_120; stable cu121 wheels do not yet.
+   - We skipped CUDA builds of torchvision/torchaudio (CPU versions suffice for voice generation).
+
+3) Ran scripts from the project root
+   - Ensured imports resolved to the installed nightly wheel (not any local source tree).
+
+4) Optional PATH hygiene (only needed for source-build experiments or DLL errors)
+   - Prepend these paths for the session if you see WinError 126 during imports:
+     C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v13.0\bin
+     C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v13.0\bin\x64
+     D:\TikTok project\pytorch\torch\lib
+
+Verification
+- In the activated venv we ran:
+  python -c "import torch; print('torch', torch.__version__); print('cuda?', torch.cuda.is_available()); print('runtime', torch.version.cuda); print('cap', torch.cuda.get_device_capability() if torch.cuda.is_available() else 'NA'); print('device', torch.cuda.get_device_name(0) if torch.cuda.is_available() else 'CPU')"
+
+- Observed output (example):
+  torch 2.10.0.dev20251016+cu129
+  cuda? True
+  runtime 12.9
+  cap (12, 0)
+  device NVIDIA GeForce RTX 5060 Ti
+
+How it works (runtime notes)
+- The cu129 nightly wheel bundles the CUDA runtime; it does not require a separate system CUDA toolkit to run.
+- For RTX 50-series, PyTorch needs kernels compiled for sm_120; nightlies (or source builds) provide them.
+- torchvision/torchaudio are optional for VibeVoice; if needed, install CPU-only builds to avoid CUDA version mismatches.
+- Performance tip: call torch.set_float32_matmul_precision("high") on CUDA to use faster matmul kernels on newer GPUs.
+
+Summary
+- We successfully ran the PyTorch nightly cu129 wheel on an RTX 5060 Ti with full CUDA support.
+- Keep using this virtual environment and avoid mixing stable cu121 packages with the nightly torch to prevent mismatched kernels.
+- This setup lets us run VibeVoice voice synthesis on GPU before official sm_120 support arrives in stable PyTorch.
